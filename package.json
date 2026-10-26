@@ -1,0 +1,12 @@
+{
+  "name": "morning-weight-tracker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Local-first PWA for daily weight and habit tracking. No build step and no runtime dependencies.",
+  "scripts": {
+    "start": "python3 -m http.server 8080",
+    "test": "node --test tests/unit.test.mjs",
+    "test:e2e": "node tests/e2e.mjs"
+  }
+}

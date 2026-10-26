@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en-GB" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <title>Morning Weight Tracker</title>
+  <meta name="description" content="Private, local-first daily weight and habit tracker.">
+  <meta name="theme-color" content="#f7f6f3" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#151514" media="(prefers-color-scheme: dark)">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Weight">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div id="storage-banner" class="banner error" hidden role="alert"></div>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <span class="brand" aria-hidden="true"><img src="icons/icon.svg" alt="" width="26" height="26"></span>
+      <h1 id="view-title">Today</h1>
+      <span id="today-label" class="muted small"></span>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <div id="loading" class="loading" role="status">Loading your records…</div>
+    <section id="view-home" class="view" hidden></section>
+    <section id="view-checkin" class="view" hidden></section>
+    <section id="view-progress" class="view" hidden></section>
+    <section id="view-history" class="view" hidden></section>
+    <section id="view-settings" class="view" hidden></section>
+    <section id="view-restore" class="view" hidden></section>
+  </main>
+
+  <nav class="tabbar" aria-label="Main">
+    <a href="#/home" data-tab="home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Home</span></a>
+    <a href="#/checkin" data-tab="checkin"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Check-In</span></a>
+    <a href="#/progress" data-tab="progress"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19h16M6 15l4-5 3 3 5-7"/></svg><span>Progress</span></a>
+    <a href="#/history" data-tab="history"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg><span>History</span></a>
+    <a href="#/settings" data-tab="settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg><span>Settings</span></a>
+  </nav>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <noscript><p class="banner error">This app needs JavaScript enabled to run.</p></noscript>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
