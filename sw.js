@@ -1,7 +1,7 @@
 // Offline support. Bump VERSION whenever any app file changes.
 // The cache holds only app code; user records live in IndexedDB and are
 // never touched by the service worker.
-const VERSION = 'mwt-v1.0.0';
+const VERSION = 'mwt-v1.1.0';
 const ASSETS = [
   './', 'index.html', 'manifest.webmanifest', 'css/app.css',
   'js/app.js', 'js/state.js', 'js/db.js', 'js/dates.js', 'js/model.js', 'js/calc.js', 'js/format.js',

@@ -40,6 +40,7 @@ export function renderHome(root, params = {}) {
       <a class="btn primary" href="#/checkin">Start check-in</a></div>`;
   }
 
+  html += keyNumbers();
   html += goalCard(latest);
   html += `<div class="card" id="weekly-card"></div>`;
 
@@ -104,6 +105,36 @@ export function renderHome(root, params = {}) {
       return tip(formatShort(date), [d ? ['Weight', f.weight(d.d.value)] : null, a ? ['7-day avg', `${f.weight(a.d.value)} (${a.d.n})`] : null].filter(Boolean));
     },
   });
+}
+
+/** Headline tiles: overall calories, weeks to target date, last/this week's weight. */
+function keyNumbers() {
+  const { records, settings: s, fmt: f, today } = state;
+  const monday = mondayOf(today), lastMonday = addDays(monday, -7), lastSunday = addDays(monday, -1);
+  const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
+
+  const cal = C.windowStats(records, 'caloriesKcal', 'lifestyleDate', '1900-01-01', today);
+  const firstCal = records.find(r => r.caloriesKcal !== null)?.lifestyleDate;
+  const calTile = statCard('Overall average calories', cal.n ? f.kcal(cal.avg) : '—',
+    cal.n ? `${plural(cal.n, 'logged day')} since ${esc(formatDayMonth(firstCal))}` : 'No calories logged yet', { id: 'key-cal' });
+
+  const g = C.goalCountdown({ latest: null, targetKg: s.targetWeightKg, targetDate: s.targetDate, today });
+  let weeks, weeksSub;
+  if (!g.hasDate) { weeks = '—'; weeksSub = '<a href="#/settings">Set a target date</a>'; }
+  else if (g.datePassed) { weeks = 'Passed'; weeksSub = `Target date was ${esc(formatDayMonth(g.targetDate))}`; }
+  else if (g.dateIsToday) { weeks = '0 weeks'; weeksSub = 'Target date is today'; }
+  else { weeks = `${f.num(g.weeksRemaining, 1)} weeks`; weeksSub = `${plural(g.daysRemaining, 'day')} to ${esc(formatDayMonth(g.targetDate))}`; }
+  const weeksTile = statCard('Weeks to target date', weeks, weeksSub, { id: 'key-weeks' });
+
+  const last = C.windowStats(records, 'weightKg', 'measurementDate', lastMonday, lastSunday);
+  const cur = C.windowStats(records, 'weightKg', 'measurementDate', monday, today);
+  const lastTile = statCard("Last week's average weight", last.n ? f.weight(last.avg) : '—',
+    `${last.n ? plural(last.n, 'weigh-in') : 'No weigh-ins'} · ${esc(formatDayMonth(lastMonday))}–${esc(formatDayMonth(lastSunday))}`, { id: 'key-lastwk' });
+  let curSub = `${cur.n ? plural(cur.n, 'weigh-in') : 'No weigh-ins yet'} · Mon ${esc(formatDayMonth(monday))} to today`;
+  if (cur.n && last.n) curSub += ` · ${f.weightDiff(cur.avg - last.avg)} vs last week`;
+  const curTile = statCard("This week's running average", cur.n ? f.weight(cur.avg) : '—', curSub, { id: 'key-thiswk' });
+
+  return `<div class="stats key-numbers">${calTile}${weeksTile}${lastTile}${curTile}</div>`;
 }
 
 function goalCard(latest) {

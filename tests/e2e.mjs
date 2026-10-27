@@ -162,6 +162,8 @@ section('7 & 12. Missing data, invalid input, duplicates');
 await go(page, '#/home');
 check('Missing weight: goal shows "No weight recorded yet"', (await text(page, '#goal-card')).includes('No weight recorded yet'));
 check('Missing data: averages show — not 0', (await text(page, '[data-stat="cal"] .stat-value')) === '—' && (await text(page, '[data-stat="avg7"] .stat-value')) === '—');
+check('Key numbers with no data show — not 0', (await text(page, '[data-stat="key-cal"] .stat-value')) === '—' && (await text(page, '[data-stat="key-thiswk"] .stat-value')) === '—' && (await text(page, '[data-stat="key-lastwk"] .stat-value')) === '—');
+check('Weeks to target date shown without weight data (81 days = 11.6 weeks)', (await text(page, '[data-stat="key-weeks"] .stat-value')) === '11.6 weeks' && (await text(page, '[data-stat="key-weeks"]')).includes('81 days to 15 Jan'));
 check('No calorie data message', (await text(page, '[data-week="empty"]')) === 'No calorie data logged this week.');
 await go(page, '#/checkin');
 await fill(page, '#f-weight', 'abc'); await fill(page, '#f-steps', '-5'); await fill(page, '#f-calories', '12.5');
@@ -244,12 +246,17 @@ check('Week label uses explicit Monday–Sunday dates', (await text(page, '[data
 check('Running average excludes missing day, includes recorded zero: 1,467', (await text(page, '[data-week="avg"]')) === '1,467', await text(page, '[data-week="avg"]'));
 check('Total so far 4,400 kcal', (await text(page, '[data-week="total"]')) === '4,400');
 check('Logged days 3 of 5 elapsed', (await text(page, '[data-week="n"]')) === '3' && (await text(page, '#weekly-card')).includes('of 5 days elapsed'));
+check('Overall calorie average uses logged days only (6,900 / 4 = 1,725)', (await text(page, '[data-stat="key-cal"] .stat-value')) === '1,725 kcal' && (await text(page, '[data-stat="key-cal"]')).includes('4 logged days since 25 Oct'));
+check("This week's running weight average (Mon–Fri, 3 weigh-ins = 108.7)", (await text(page, '[data-stat="key-thiswk"] .stat-value')) === '108.7 kg' && (await text(page, '[data-stat="key-thiswk"]')).includes('3 weigh-ins'));
+check('Last week average blank when last week had no weigh-ins', (await text(page, '[data-stat="key-lastwk"] .stat-value')) === '—' && (await text(page, '[data-stat="key-lastwk"]')).includes('No weigh-ins · 19 Oct–25 Oct'));
+check('Weeks to target date from Fri 30 Oct (77 days = 11.0 weeks)', (await text(page, '[data-stat="key-weeks"] .stat-value')) === '11.0 weeks');
 check('Target comparison shown', (await text(page, '#weekly-card')).includes('533 kcal below'));
 check('Weekly chart: 3 bars (zero drawn as baseline mark), future days empty', (await page.locator('#week-chart path.bar').count()) === 3 && (await page.locator('#week-chart line.zero-mark').count()) === 1);
 // Edit a previous day's calories -> correct historical week
 await go(page, '#/checkin/2026-10-28');
 await fill(page, '#f-calories', '1400'); await saveForm(page);
 check('Editing Tue intake updates the current week (1,133)', (await text(page, '[data-week="avg"]')) === '1,133');
+check('Editing a calorie entry updates the overall average (5,900 / 4 = 1,475)', (await text(page, '[data-stat="key-cal"] .stat-value')) === '1,475 kcal');
 await page.click('#wk-prev'); await page.waitForTimeout(100);
 check('Previous week unaffected by edit (2,500, 1 day)', (await text(page, '[data-week="avg"]')) === '2,500' && (await text(page, '[data-week="label"]')).startsWith('Week: Monday, 19 October'));
 // Sunday then Monday rollover
@@ -261,6 +268,8 @@ await setDay(page, '2026-11-02T07:00:00');
 await go(page, '#/home');
 check('Monday starts a new week automatically', (await text(page, '[data-week="label"]')) === 'Current week: Monday, 2 November – Sunday, 8 November');
 check('New week has no data yet on Monday morning', (await text(page, '[data-week="empty"]')) === 'No calorie data logged this week.');
+check("Monday: last week's weight average rolls over (26 Oct–1 Nov = 108.7)", (await text(page, '[data-stat="key-lastwk"] .stat-value')) === '108.7 kg' && (await text(page, '[data-stat="key-lastwk"]')).includes('26 Oct–1 Nov'));
+check("Monday: this week's running average starts empty", (await text(page, '[data-stat="key-thiswk"] .stat-value')) === '—');
 check('Monday note explains Sunday intake belongs to last week', (await text(page, '#weekly-card')).includes("belongs to last week"));
 await page.click('#wk-prev'); await page.waitForTimeout(100);
 check("Sunday's week remains available after Monday: 4 days, total 5,200", (await text(page, '[data-week="total"]')) === '5,200' && (await text(page, '[data-week="n"]')) === '4');
@@ -275,6 +284,7 @@ check('Target date editable in Settings; countdown follows', (await text(page, '
 // Passed deadline
 await setDay(page, '2027-02-20T08:00:00'); await go(page, '#/home');
 check('Passed deadline: "Target date passed", no negative countdown', (await text(page, '[data-goal="days"]')) === 'Target date passed' && (await text(page, '[data-goal="rate"]')) === 'Not calculated');
+check('Passed deadline: weeks tile says Passed, no negative weeks', (await text(page, '[data-stat="key-weeks"] .stat-value')) === 'Passed');
 check('Goal uses latest recorded weight, with age shown', (await text(page, '#goal-card')).includes('108.2 kg on 30 Oct'));
 await ctx.close();
 
